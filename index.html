@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Compressor & Resizer</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --gray: #94a3b8;
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.5);
+      --text: #e2e8f0;
+      --border: rgba(148, 163, 184, 0.25);
+      --blur: blur(12px);
+      --shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      backdrop-filter: var(--blur);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), #1d4ed8);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .upload-area {
+      border: 2px dashed var(--primary);
+      border-radius: 16px;
+      padding: 50px 20px;
+      margin: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(59, 130, 246, 0.08);
+      backdrop-filter: var(--blur);
+    }
+
+    .upload-area:hover {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: #60a5fa;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 0 24px 24px;
+    }
+
+    .group label {
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input[type="number"], input[type="range"], select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(30, 41, 59, 0.6);
+      color: var(--text);
+      backdrop-filter: var(--blur);
+      font-size: 1rem;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.2);
+      accent-color: var(--primary);
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 16px 24px;
+    }
+
+    button {
+      padding: 12px 32px;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      backdrop-filter: var(--blur);
+      min-width: 160px;
+    }
+
+    #processBtn, #downloadBtn {
+      background: rgba(16, 185, 129, 0.25);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+    }
+
+    #processBtn:hover, #downloadBtn:hover {
+      background: rgba(16, 185, 129, 0.4);
+      transform: translateY(-3px);
+    }
+
+    #resetBtn {
+      background: rgba(239, 68, 68, 0.25);
+      color: white;
+      box-shadow: 0 4px 15px rgba(239,68,68,0.3);
+    }
+
+    #resetBtn:hover {
+      background: rgba(239, 68, 68, 0.4);
+      transform: translateY(-3px);
+    }
+
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.4);
+      flex-grow: 1;
+    }
+
+    .preview-box {
+      background: var(--card-bg);
+      backdrop-filter: var(--blur);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-label {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.05rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-box img {
+      width: 100%;
+      height: 220px;
+      object-fit: contain;
+      background: #0f172a;
+    }
+
+    .size-info {
+      padding: 12px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--gray);
+      font-weight: 500;
+      background: rgba(0,0,0,0.3);
+    }
+
+    footer {
+      text-align: center;
+      padding: 16px 24px;
+      color: var(--gray);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      background: var(--card-bg);
+      backdrop-filter: var(--blur);
+    }
+
+    @media (min-width: 640px) {
+      .controls { grid-template-columns: repeat(2, 1fr); }
+      .preview-area { flex-direction: row; gap: 32px; }
+      .preview-box { flex: 1; max-width: 50%; }
+    }
+
+    @media (min-width: 900px) {
+      .controls { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Image Compressor & Resizer</h1>
+  </header>
+
+  <div class="upload-area" id="uploadArea">
+    <p>Click here or Drag & Drop your image</p>
+    <input type="file" id="fileInput" accept="image/*" hidden>
+  </div>
+
+  <div class="hidden" id="editor">
+    <div class="controls">
+      <div>
+        <label><input type="checkbox" id="lockRatio" checked> Lock Aspect Ratio</label>
+      </div>
+
+      <div>
+        <label>Width (px) — blank = original</label>
+        <input type="number" id="width" min="10" placeholder="auto">
+      </div>
+
+      <div>
+        <label>Height (px) — blank = original</label>
+        <input type="number" id="height" min="10" placeholder="auto">
+      </div>
+
+      <div class="reset-row">
+        <button id="resetBtn">Reset to Original Size</button>
+      </div>
+
+      <div>
+        <label>Quality: <span id="qVal">0.75</span></label>
+        <input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.75">
+      </div>
+
+      <div>
+        <label>Output Format</label>
+        <select id="format">
+          <option value="image/jpeg" selected>JPG</option>
+          <option value="image/webp">WEBP</option>
+          <option value="image/png">PNG</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button id="processBtn">Process Image</button>
+      <button id="downloadBtn">Download Processed</button>
+    </div>
+
+    <div class="preview-area">
+      <div class="preview-box">
+        <div class="preview-label">Original</div>
+        <img id="origImg" alt="Original">
+        <div class="size-info" id="origSize">Original Size: —</div>
+      </div>
+
+      <div class="preview-box">
+        <div class="preview-label">Processed</div>
+        <img id="procImg" alt="Processed">
+        <div class="size-info" id="procSize">Processed Size: —</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 RahiIndia. All rights reserved.
+  </footer>
+</div>
+
+<script>
+// तुम्हारा मूल JS कोड बिल्कुल वैसा ही रखा है (कोई बदलाव नहीं)
+const uploadArea = document.getElementById('uploadArea');
+const fileInput  = document.getElementById('fileInput');
+const editor     = document.getElementById('editor');
+const origImg    = document.getElementById('origImg');
+const procImg    = document.getElementById('procImg');
+const origSize   = document.getElementById('origSize');
+const procSize   = document.getElementById('procSize');
+const widthIn    = document.getElementById('width');
+const heightIn   = document.getElementById('height');
+const qualityIn  = document.getElementById('quality');
+const qVal       = document.getElementById('qVal');
+const formatSel  = document.getElementById('format');
+const processBtn = document.getElementById('processBtn');
+const downloadBtn= document.getElementById('downloadBtn');
+const resetBtn   = document.getElementById('resetBtn');
+
+let origFile = null;
+let origW = 0;
+let origH = 0;
+let processedBlob = null;
+
+uploadArea.onclick = () => fileInput.click();
+
+fileInput.onchange = e => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+};
+
+uploadArea.ondragover = e => { e.preventDefault(); uploadArea.style.background = 'rgba(59,130,246,0.15)'; };
+uploadArea.ondragleave = () => uploadArea.style.background = '';
+uploadArea.ondrop = e => {
+  e.preventDefault();
+  uploadArea.style.background = '';
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+};
+
+function handleFile(file) {
+  if (!file.type.startsWith('image/')) return alert('Please select an image');
+  origFile = file;
+  const url = URL.createObjectURL(file);
+  origImg.src = url;
+  origSize.textContent = `Original Size: ${(file.size / 1024).toFixed(2)} KB`;
+
+  const img = new Image();
+  img.onload = () => {
+    origW = img.width;
+    origH = img.height;
+    widthIn.value = img.width;
+    heightIn.value = img.height;
+    editor.classList.remove('hidden');
+  };
+  img.src = url;
+}
+
+qualityIn.oninput = () => qVal.textContent = qualityIn.value;
+
+resetBtn.onclick = () => {
+  widthIn.value = origW;
+  heightIn.value = origH;
+};
+
+widthIn.oninput = function() {
+  if (document.getElementById('lockRatio').checked && origW) {
+    heightIn.value = Math.round(this.value * origH / origW);
+  }
+};
+
+heightIn.oninput = function() {
+  if (document.getElementById('lockRatio').checked && origW) {
+    widthIn.value = Math.round(this.value * origW / origH);
+  }
+};
+
+processBtn.onclick = function() {
+  if (!origFile) return;
+
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    let w = parseInt(widthIn.value) || img.width;
+    let h = parseInt(heightIn.value) || img.height;
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+    const mime = formatSel.value;
+    const q = parseFloat(qualityIn.value);
+
+    canvas.toBlob(function(blob) {
+      if (!blob) return;
+      processedBlob = blob;
+      procImg.src = URL.createObjectURL(blob);
+
+      const newKB = (blob.size / 1024).toFixed(2);
+      const saved = Math.round((1 - blob.size / origFile.size) * 100);
+      procSize.textContent = 'Processed Size: ' + newKB + ' KB (' + saved + '% smaller)';
+    }, mime, (mime === 'image/jpeg' || mime === 'image/webp') ? q : 1);
+  };
+  img.src = URL.createObjectURL(origFile);
+};
+
+downloadBtn.onclick = function() {
+  if (!processedBlob) return alert('Please process first');
+  const ext = formatSel.value.split('/')[1];
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(processedBlob);
+  a.download = 'processed.' + ext;
+  a.click();
+};
+</script>
+</body>
+</html>
