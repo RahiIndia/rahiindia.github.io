@@ -2,275 +2,185 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Image Compressor & Resizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Rahi India | Software Developer & Web Designer</title>
+  <meta name="description" content="Software Developer & Web Designer | Python, Java, JavaScript, Modern Web Solutions"/>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --primary: #3b82f6;
-      --success: #10b981;
-      --danger: #ef4444;
-      --gray: #94a3b8;
-      --bg: #0f172a;
-      --card-bg: rgba(30, 41, 59, 0.5);
-      --text: #e2e8f0;
-      --border: rgba(148, 163, 184, 0.25);
-      --blur: blur(12px);
-      --shadow: 0 8px 32px rgba(0,0,0,0.5);
+      --primary: #6366f1;
+      --dark: #0a0f1a;
+      --accent: #a5b4fc;
+      --light: #e2e8f0;
     }
-
-    * { margin:0; padding:0; box-sizing:border-box; }
-
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--light);
+      line-height: 1.6;
       min-height: 100vh;
-      padding: 16px;
+      display: flex;
+      flex-direction: column;
     }
-
+    
     .container {
-      max-width: 920px;
+      width: 100%;
+      max-width: 1000px;
       margin: 0 auto;
-      background: var(--card-bg);
-      backdrop-filter: var(--blur);
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+      padding: 0 1rem;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .content {
+      text-align: center;
+      width: 100%;
+      padding: clamp(2rem, 8vw, 4rem) 0 2.5rem;
+    }
+    
+    .brand-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.65rem, 5.3025vw, 2.475rem); /* ← अब 3% और छोटा (पिछले से 3% कम) */
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      letter-spacing: clamp(4px, 1.2vw, 8px);
+      background: linear-gradient(90deg, #a5b4fc, #6366f1, #a5b4fc, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 300% auto;
+      animation: gradientFlow 8s linear infinite;
+      display: inline-block;
+      white-space: nowrap;
+      text-shadow: 0 0 30px rgba(99,102,241,0.5);
+    }
+    
+    @keyframes gradientFlow {
+      0% { background-position: 0% center; }
+      100% { background-position: 300% center; }
+    }
+    
+    .subtitle {
+      font-size: clamp(1.3rem, 4.5vw, 1.9rem);
+      color: var(--accent);
+      margin-bottom: 1.8rem;
+      font-weight: 500;
+    }
+    
+    .bio {
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+      font-size: clamp(1rem, 3.8vw, 1.2rem);
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+    
+    .skills {
+      margin: 2.5rem 0 3.5rem;
+    }
+    
+    .skills h3 {
+      font-size: clamp(1.3rem, 4.5vw, 1.8rem);
+      margin-bottom: 1.5rem;
+      color: white;
+    }
+    
+    .skill-tags-wrapper {
+      width: 100%;
       overflow: hidden;
     }
-
-    header {
-      background: linear-gradient(135deg, var(--primary), #1d4ed8);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      font-weight: 600;
-    }
-
-    .upload-area {
-      border: 2px dashed var(--primary);
-      border-radius: 16px;
-      padding: 50px 20px;
-      margin: 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: rgba(59, 130, 246, 0.08);
-      backdrop-filter: var(--blur);
-    }
-
-    .upload-area:hover {
-      background: rgba(59, 130, 246, 0.18);
-      border-color: #60a5fa;
-    }
-
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      padding: 0 24px 24px;
-    }
-
-    .group label {
-      font-weight: 500;
-      color: var(--text);
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    input[type="number"], input[type="range"], select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(30, 41, 59, 0.6);
-      color: var(--text);
-      backdrop-filter: var(--blur);
-      font-size: 1rem;
-    }
-
-    input[type="checkbox"] {
-      margin-right: 8px;
-      transform: scale(1.2);
-      accent-color: var(--primary);
-    }
-
-    .button-group {
+    
+    .skill-tags {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
-      padding: 16px 24px;
+      gap: clamp(0.5rem, 2vw, 0.8rem);
+      max-width: 100%;
     }
-
-    button {
-      padding: 12px 32px;
-      font-size: 1rem;
-      font-weight: 500;
-      border-radius: 10px;
-      cursor: pointer;
-      border: 1px solid var(--border);
+    
+    .tag {
+      background: rgba(99,102,241,0.12);
+      color: var(--accent);
+      padding: clamp(0.45rem, 1.5vw, 0.6rem) clamp(0.9rem, 2.5vw, 1.2rem);
+      border-radius: 50px;
+      font-size: clamp(0.8rem, 3vw, 1rem);
+      border: 1px solid rgba(99,102,241,0.25);
+      white-space: nowrap;
       transition: all 0.3s ease;
-      backdrop-filter: var(--blur);
-      min-width: 160px;
     }
-
-    #processBtn, #downloadBtn {
-      background: rgba(16, 185, 129, 0.25);
-      color: white;
-      box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+    
+    .tag:hover {
+      background: rgba(99,102,241,0.3);
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(99,102,241,0.3);
     }
-
-    #processBtn:hover, #downloadBtn:hover {
-      background: rgba(16, 185, 129, 0.4);
-      transform: translateY(-3px);
-    }
-
-    #resetBtn {
-      background: rgba(239, 68, 68, 0.25);
-      color: white;
-      box-shadow: 0 4px 15px rgba(239,68,68,0.3);
-    }
-
-    #resetBtn:hover {
-      background: rgba(239, 68, 68, 0.4);
-      transform: translateY(-3px);
-    }
-
-    .preview-area {
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-      padding: 24px;
-      background: rgba(15, 23, 42, 0.4);
-      flex-grow: 1;
-    }
-
-    .preview-box {
-      background: var(--card-bg);
-      backdrop-filter: var(--blur);
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .preview-label {
-      background: rgba(15, 23, 42, 0.6);
-      padding: 12px;
-      text-align: center;
-      font-weight: 600;
-      font-size: 1.05rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .preview-box img {
-      width: 100%;
-      height: 220px;
-      object-fit: contain;
-      background: #0f172a;
-    }
-
-    .size-info {
-      padding: 12px;
-      text-align: center;
-      font-size: 0.95rem;
-      color: var(--gray);
-      font-weight: 500;
-      background: rgba(0,0,0,0.3);
-    }
-
+    
     footer {
       text-align: center;
-      padding: 16px 24px;
-      color: var(--gray);
+      padding: 2rem 1rem 1.5rem;
+      color: #475569;
       font-size: 0.9rem;
-      border-top: 1px solid var(--border);
-      background: var(--card-bg);
-      backdrop-filter: var(--blur);
+      border-top: 1px solid #1e293b;
     }
-
-    @media (min-width: 640px) {
-      .controls { grid-template-columns: repeat(2, 1fr); }
-      .preview-area { flex-direction: row; gap: 32px; }
-      .preview-box { flex: 1; max-width: 50%; }
-    }
-
-    @media (min-width: 900px) {
-      .controls { grid-template-columns: repeat(3, 1fr); }
+    
+    @media (max-width: 480px) {
+      .container { padding: 0 0.8rem; }
+      .skill-tags { gap: 0.5rem; }
+      .tag { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <header>
-    <h1>Image Compressor & Resizer</h1>
-  </header>
-
-  <div class="upload-area" id="uploadArea">
-    <p>Click here or Drag & Drop your image</p>
-    <input type="file" id="fileInput" accept="image/*" hidden>
-  </div>
-
-  <div class="hidden" id="editor">
-    <div class="controls">
-      <div>
-        <label><input type="checkbox" id="lockRatio" checked> Lock Aspect Ratio</label>
-      </div>
-
-      <div>
-        <label>Width (px) — blank = original</label>
-        <input type="number" id="width" min="10" placeholder="auto">
-      </div>
-
-      <div>
-        <label>Height (px) — blank = original</label>
-        <input type="number" id="height" min="10" placeholder="auto">
-      </div>
-
-      <div class="reset-row">
-        <button id="resetBtn">Reset to Original Size</button>
-      </div>
-
-      <div>
-        <label>Quality: <span id="qVal">0.75</span></label>
-        <input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.75">
-      </div>
-
-      <div>
-        <label>Output Format</label>
-        <select id="format">
-          <option value="image/jpeg" selected>JPG</option>
-          <option value="image/webp">WEBP</option>
-          <option value="image/png">PNG</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="button-group">
-      <button id="processBtn">Process Image</button>
-      <button id="downloadBtn">Download Processed</button>
-    </div>
-
-    <div class="preview-area">
-      <div class="preview-box">
-        <div class="preview-label">Original</div>
-        <img id="origImg" alt="Original">
-        <div class="size-info" id="origSize">Original Size: —</div>
-      </div>
-
-      <div class="preview-box">
-        <div class="preview-label">Processed</div>
-        <img id="procImg" alt="Processed">
-        <div class="size-info" id="procSize">Processed Size: —</div>
+  <div class="container">
+    <div class="content">
+      <!-- RahiIndia CodeLab अब और 3% छोटा है (कुल \~38% मूल से छोटा) -->
+      <div class="brand-name">RahiIndia CodeLab</div>
+      <div class="subtitle">Software Developer & Web Designer</div>
+      
+      <p class="bio">
+        I turn ideas into reality with clean, efficient code and stunning, user-focused designs. 
+        Specializing in problem-solving, scalable applications, automation, and modern responsive websites. 
+        Passionate about performance, clean architecture, and delivering high-quality solutions that matter.
+      </p>
+      
+      <div class="skills">
+        <h3>Core Skills</h3>
+        <div class="skill-tags-wrapper">
+          <div class="skill-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Java</span>
+            <span class="tag">C++</span>
+            <span class="tag">JavaScript</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">HTML/CSS</span>
+            <span class="tag">Tailwind</span>
+            <span class="tag">React</span>
+            <span class="tag">Node.js</span>
+            <span class="tag">SQL</span>
+            <span class="tag">Git</span>
+            <span class="tag">UI/UX</span>
+            <span class="tag">Algorithms</span>
+            <span class="tag">Automation</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -278,118 +188,6 @@
   <footer>
     © 2026 RahiIndia. All rights reserved.
   </footer>
-</div>
 
-<script>
-// तुम्हारा मूल JS कोड बिल्कुल वैसा ही रखा है (कोई बदलाव नहीं)
-const uploadArea = document.getElementById('uploadArea');
-const fileInput  = document.getElementById('fileInput');
-const editor     = document.getElementById('editor');
-const origImg    = document.getElementById('origImg');
-const procImg    = document.getElementById('procImg');
-const origSize   = document.getElementById('origSize');
-const procSize   = document.getElementById('procSize');
-const widthIn    = document.getElementById('width');
-const heightIn   = document.getElementById('height');
-const qualityIn  = document.getElementById('quality');
-const qVal       = document.getElementById('qVal');
-const formatSel  = document.getElementById('format');
-const processBtn = document.getElementById('processBtn');
-const downloadBtn= document.getElementById('downloadBtn');
-const resetBtn   = document.getElementById('resetBtn');
-
-let origFile = null;
-let origW = 0;
-let origH = 0;
-let processedBlob = null;
-
-uploadArea.onclick = () => fileInput.click();
-
-fileInput.onchange = e => {
-  if (e.target.files[0]) handleFile(e.target.files[0]);
-};
-
-uploadArea.ondragover = e => { e.preventDefault(); uploadArea.style.background = 'rgba(59,130,246,0.15)'; };
-uploadArea.ondragleave = () => uploadArea.style.background = '';
-uploadArea.ondrop = e => {
-  e.preventDefault();
-  uploadArea.style.background = '';
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-};
-
-function handleFile(file) {
-  if (!file.type.startsWith('image/')) return alert('Please select an image');
-  origFile = file;
-  const url = URL.createObjectURL(file);
-  origImg.src = url;
-  origSize.textContent = `Original Size: ${(file.size / 1024).toFixed(2)} KB`;
-
-  const img = new Image();
-  img.onload = () => {
-    origW = img.width;
-    origH = img.height;
-    widthIn.value = img.width;
-    heightIn.value = img.height;
-    editor.classList.remove('hidden');
-  };
-  img.src = url;
-}
-
-qualityIn.oninput = () => qVal.textContent = qualityIn.value;
-
-resetBtn.onclick = () => {
-  widthIn.value = origW;
-  heightIn.value = origH;
-};
-
-widthIn.oninput = function() {
-  if (document.getElementById('lockRatio').checked && origW) {
-    heightIn.value = Math.round(this.value * origH / origW);
-  }
-};
-
-heightIn.oninput = function() {
-  if (document.getElementById('lockRatio').checked && origW) {
-    widthIn.value = Math.round(this.value * origW / origH);
-  }
-};
-
-processBtn.onclick = function() {
-  if (!origFile) return;
-
-  const img = new Image();
-  img.onload = function() {
-    const canvas = document.createElement('canvas');
-    let w = parseInt(widthIn.value) || img.width;
-    let h = parseInt(heightIn.value) || img.height;
-    canvas.width = w;
-    canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-    const mime = formatSel.value;
-    const q = parseFloat(qualityIn.value);
-
-    canvas.toBlob(function(blob) {
-      if (!blob) return;
-      processedBlob = blob;
-      procImg.src = URL.createObjectURL(blob);
-
-      const newKB = (blob.size / 1024).toFixed(2);
-      const saved = Math.round((1 - blob.size / origFile.size) * 100);
-      procSize.textContent = 'Processed Size: ' + newKB + ' KB (' + saved + '% smaller)';
-    }, mime, (mime === 'image/jpeg' || mime === 'image/webp') ? q : 1);
-  };
-  img.src = URL.createObjectURL(origFile);
-};
-
-downloadBtn.onclick = function() {
-  if (!processedBlob) return alert('Please process first');
-  const ext = formatSel.value.split('/')[1];
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(processedBlob);
-  a.download = 'processed.' + ext;
-  a.click();
-};
-</script>
 </body>
 </html>
